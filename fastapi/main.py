@@ -1,0 +1,1 @@
+print("test from fast api")

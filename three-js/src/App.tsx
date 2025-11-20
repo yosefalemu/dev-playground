@@ -1,53 +1,63 @@
-import { useEffect } from 'react';
 import * as THREE from 'three';
+import { useEffect } from 'react';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 export default function App() {
   useEffect(() => {
-    const scene = new THREE.Scene();
-    const cubeGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-    const cubeMaterial = new THREE.MeshBasicMaterial({ color: 'red' });
-    const cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    scene.add(cubeMesh);
+    const canvasContainer = document.getElementById('canvas-container');
+    if (!canvasContainer) return;
 
+    const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
       75,
       window.innerWidth / window.innerHeight,
-      3.9,
-      6
-    );
-
-    const aspectRatio = window.innerWidth / window.innerHeight;
-    const orthCamera = new THREE.OrthographicCamera(
-      -0.5 * aspectRatio,
-      0.5 * aspectRatio,
-      -0.5,
-      0.5,
       0.1,
       1000
     );
-    orthCamera.position.z = 5;
-    camera.position.z = 5;
+    camera.position.set(0, 0, 5);
 
-    scene.add(orthCamera);
-
-    const renderer = new THREE.WebGLRenderer();
+    const renderer = new THREE.WebGLRenderer({
+      antialias: true,
+    });
+    canvasContainer.appendChild(renderer.domElement);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    const canvasContainer = document.getElementById('canvas-container');
-    canvasContainer?.appendChild(renderer.domElement);
+    const maxPixelRatio = Math.min(window.devicePixelRatio, 2);
+    renderer.setPixelRatio(maxPixelRatio);
+    const controls = new OrbitControls(camera, renderer.domElement);
 
-    const orbit = new OrbitControls(orthCamera, renderer.domElement);
-    orbit.autoRotate = true;
-    orbit.autoRotateSpeed = 0.5;
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const materials = [
+      new THREE.MeshBasicMaterial({ color: 0xff0000 }), // right
+      new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // left
+      new THREE.MeshBasicMaterial({ color: 0x0000ff }), // top
+      new THREE.MeshBasicMaterial({ color: 0xffff00 }), // bottom
+      new THREE.MeshBasicMaterial({ color: 0xff00ff }), // front
+      new THREE.MeshBasicMaterial({ color: 0x00ffff }), // back
+    ];
+
+    const mesh = new THREE.Mesh(geometry, materials);
+    mesh.position.set(0, 0, 4.5);
+    const axisHelper = new THREE.AxesHelper(5);
+    scene.add(axisHelper);
+    scene.add(mesh);
+    console.log(
+      'mesh distance from camera',
+      mesh.position.distanceTo(camera.position)
+    );
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
     function animate() {
-      requestAnimationFrame(animate);
-      // cubeMesh.rotation.x += 0.01;
-      // cubeMesh.rotation.y += 0.01;
-      orbit.update();
-      renderer.render(scene, orthCamera);
+      window.requestAnimationFrame(animate);
+
+      controls.update();
+      renderer.render(scene, camera);
     }
     animate();
   }, []);
-
   return <div id="canvas-container" />;
 }

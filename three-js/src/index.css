@@ -24,7 +24,9 @@ a:hover {
 
 body {
   margin: 0;
-  background: #111;
+  background: #000;
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 h1 {

@@ -15,10 +15,12 @@ products = [
     Product(id=3, name="Product 3", price=300, description="Description 3"),
 ]
 
+
 # get all products
 @app.get("/products")
 def get_products():
     return products
+
 
 # get a product by id
 @app.get("/products/{product_id}")
@@ -29,11 +31,13 @@ def get_product(product_id: int):
     else:
         raise HTTPException(status_code=404, detail="Product not found")
 
+
 # create a new product
 @app.post("/product")
 def create_product(product: Product):
     products.append(product)
     return product
+
 
 # update a product
 @app.put("/products/{product_id}")
@@ -47,6 +51,7 @@ def update_product(product_id: int, updated_product: Product):
     else:
         raise HTTPException(status_code=404, detail="Product not found")
 
+
 # delete a product
 @app.delete("/products/{product_id}")
 def delete_product(product_id: int):
@@ -54,5 +59,13 @@ def delete_product(product_id: int):
     if product:
         products.remove(product)
         return {"message": "Product deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+@app.get("/products/search")
+def search_products(query:str):
+    product = next((p for p in products if query in p.name),None)
+    if product:
+        return product
     else:
         raise HTTPException(status_code=404, detail="Product not found")

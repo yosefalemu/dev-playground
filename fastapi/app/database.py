@@ -12,3 +12,6 @@ Base = declarative_base()
 
 engine = create_engine(DATABASE_URL)
 session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+

@@ -27,14 +27,13 @@ export default function App() {
 
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const materials = [
-      new THREE.MeshBasicMaterial({ color: 0xff0000}), // right
+      new THREE.MeshBasicMaterial({ color: 0xff0000 }), // right
       new THREE.MeshBasicMaterial({ color: 0x00ff00 }), // left
       new THREE.MeshBasicMaterial({ color: 0x0000ff }), // top
       new THREE.MeshBasicMaterial({ color: 0xffff00 }), // bottom
-      new THREE.MeshBasicMaterial({ color: 0xff00ff  }), // front
+      new THREE.MeshBasicMaterial({ color: 0xff00ff }), // front
       new THREE.MeshBasicMaterial({ color: 0x00ffff }), // back
     ];
-
 
     const mesh = new THREE.Mesh(geometry, materials);
     mesh.position.set(0, 0, 0);
@@ -59,6 +58,8 @@ export default function App() {
       mesh.position.distanceTo(camera.position)
     );
 
+    const clock = new THREE.Clock();
+
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -67,7 +68,13 @@ export default function App() {
 
     function animate() {
       window.requestAnimationFrame(animate);
-      mesh.rotation.x = Math.PI / 3
+      const delta = clock.getDelta();
+      const elapsed = clock.getElapsedTime();
+      mesh.rotation.x += THREE.MathUtils.degToRad(45) * delta;
+      mesh2.rotation.y += THREE.MathUtils.degToRad(30) * delta;
+      mesh3.rotation.z += THREE.MathUtils.degToRad(60) * delta;
+      mesh2.scale.y += Math.sin(elapsed) * 0.01;
+      group.position.x += Math.sin(elapsed) * 0.01;
 
       controls.update();
       renderer.render(scene, camera);

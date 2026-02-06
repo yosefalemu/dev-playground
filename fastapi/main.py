@@ -24,3 +24,4 @@ def read_item(item_id: int):
 @app.post("/items")
 def create_item(item: Item):
     return {"item": item.name, "description": item.description, "price": item.price, "is_offer": item.is_offer}
+//test

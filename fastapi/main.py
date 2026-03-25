@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from crud import router as crud_router
+from app.routers.item import router as crud_router
 from basic import router as basic_router
 from static import router as static_router
 

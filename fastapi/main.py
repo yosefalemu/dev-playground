@@ -1,27 +1,16 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
+
+from crud import router as crud_router
+from basic import router as basic_router
+from static import router as static_router
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-class Item(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    is_offer: bool = False
+app.include_router(crud_router)
+app.include_router(basic_router)
+app.include_router(static_router)
 
-@app.get("/")
-def read_root():
-    return {"message" : "Hello FastAPI!"}
 
-@app.get("/items")
-def read_items():
-    return {"message" : "Items"}
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int):
-    return {"item_id": item_id}
-
-@app.post("/items")
-def create_item(item: Item):
-    return {"item": item.name, "description": item.description, "price": item.price, "is_offer": item.is_offer}
-//test

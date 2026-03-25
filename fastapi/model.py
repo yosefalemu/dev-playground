@@ -1,8 +1,12 @@
-from pydantic import BaseModel
+import uuid
+from sqlalchemy import Column, String, Float, UUID
+from sqlalchemy.dialects.postgresql import UUID
+from database import Base
 
-class Item(BaseModel):
-    id: int | None = None
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
+class Item(Base):
+    __tablename__ = "items"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    name = Column(String, index=True)
+    description = Column(String, nullable=True)
+    price = Column(Float)
+    tax = Column(Float, nullable=True)

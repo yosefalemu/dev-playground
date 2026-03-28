@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-import hello as hello_module
+from app.dependencies.hello import hello as hello_module
 
 router = APIRouter()
 

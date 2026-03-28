@@ -1,5 +1,5 @@
 import uuid
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class ItemBase(BaseModel):
     id: uuid.UUID
@@ -7,6 +7,10 @@ class ItemBase(BaseModel):
     description: str | None = None
     price: float
     tax: float | None = None
+
+class ItemResponse(BaseModel):
+    data: list[ItemBase]
+    total: int
 
 class ItemCreate(BaseModel):
     name: str

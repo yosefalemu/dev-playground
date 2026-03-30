@@ -1,13 +1,18 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
+from app.core.database import engine
+from app.infrastructure.db.models import Base
+from app.presentation.routes import product_routes
 
-from app.routers.items import router as items_router
-from app.routers.basic import router as basic_router
-from app.routers.static import router as static_router
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # This runs on startup: Creates tables in Neon
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    # This runs on shutdown (optional)
+    await engine.dispose()
 
-app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app = FastAPI(lifespan=lifespan)
 
-app.include_router(items_router)
-app.include_router(basic_router)
-app.include_router(static_router)
+app.include_router(product_routes.router)

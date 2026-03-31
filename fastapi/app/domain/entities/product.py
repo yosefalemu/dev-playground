@@ -1,5 +1,6 @@
+from typing import Optional
 class Product:
-    def __init__ (self, id: int, name: str, stock: int, price: float):
+    def __init__ (self, id: Optional[int], name: str, stock: int, price: float):
         self.id = id
         self.name = name
         self.stock = stock
@@ -12,4 +13,6 @@ class Product:
         else:
             raise ValueError("Not enough stock available")
     def increase_stock(self, quantity: int):
+        if quantity < 0:
+            raise ValueError("Quantity must be positive")
         self.stock += quantity

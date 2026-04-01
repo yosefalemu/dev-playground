@@ -1,4 +1,6 @@
-from sqlalchemy import select
+from typing import Optional
+
+from sqlalchemy import select, func, update
 from app.domain.entities.product import Product
 from app.domain.repositories.product_repository import ProductRepository
 from app.infrastructure.db.models import ProductModel
@@ -10,7 +12,11 @@ class ProductRepositoryImpl(ProductRepository):
         async with SessionLocal() as session:
             result = await session.execute(select(ProductModel))
             product_models = result.scalars().all()
-            return [
+            count_result = await session.execute(
+                select(func.count()).select_from(ProductModel)
+            )
+            count = count_result.scalar_one()
+            products = [
                 Product(
                     id=product_model.id,
                     name=product_model.name,
@@ -19,9 +25,10 @@ class ProductRepositoryImpl(ProductRepository):
                 )
                 for product_model in product_models
             ]
+            return products, count
             
 
-    async def get_product_by_id(self, product_id):
+    async def get_product_by_id(self, product_id) -> Optional[Product]:
         async with SessionLocal() as session:
             result = await session.execute(
                 select(ProductModel).where(ProductModel.id == product_id)
@@ -85,4 +92,51 @@ class ProductRepositoryImpl(ProductRepository):
                 name=product_model.name,
                 stock=product_model.stock,
                 price=product_model.price,
+            )
+        
+    async def purchase_product(self, product_id, quantity):
+        async with SessionLocal() as session:
+            stmt = (
+                update(ProductModel)
+                .where(ProductModel.id == product_id)
+                .where(ProductModel.stock >= quantity)
+                .values(stock=ProductModel.stock - quantity)
+                .returning(ProductModel)
+            )
+
+            result = await session.execute(stmt)
+            updated_product_model = result.scalar_one_or_none()
+            if not updated_product_model:
+                # This means either the product was not found or there was insufficient stock
+                return None
+            await session.commit()
+
+            return Product(
+                id=updated_product_model.id,
+                name=updated_product_model.name,
+                stock=updated_product_model.stock,
+                price=updated_product_model.price,
+            )
+        
+    async def increase_stock(self, product_id, quantity):
+        async with SessionLocal() as session:
+            stmt = (
+                update(ProductModel)
+                .where(ProductModel.id == product_id)
+                .values(stock=ProductModel.stock + quantity)
+                .returning(ProductModel)
+            )
+
+            result = await session.execute(stmt)
+            updated_product_model = result.scalar_one_or_none()
+            if not updated_product_model:
+                # This means the product was not found
+                return None
+            await session.commit()
+
+            return Product(
+                id=updated_product_model.id,
+                name=updated_product_model.name,
+                stock=updated_product_model.stock,
+                price=updated_product_model.price,
             )

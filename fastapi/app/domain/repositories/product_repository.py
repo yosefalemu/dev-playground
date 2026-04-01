@@ -22,3 +22,11 @@ class ProductRepository(ABC):
     @abstractmethod
     def delete_product(self, product_id: int) -> Optional[Product]:
         pass
+
+    @abstractmethod
+    def purchase_product(self, product_id: int, quantity: int) -> Product:
+        pass
+
+    @abstractmethod
+    def increase_stock(self, product_id: int, quantity: int) -> Product:
+        pass

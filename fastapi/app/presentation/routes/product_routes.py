@@ -1,26 +1,16 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from app.application.services.product_service import ProductService
+from app.domain.exceptions.product_exc import ProductNotFoundException
 from app.infrastructure.repositories.product_repository_impl import ProductRepositoryImpl
 from app.domain.entities.product import Product
+from app.presentation.schemas.product_schema import ProductCreateRequest, ProductPurchaseRequest, ProductIncreaseStockRequest
 
 router = APIRouter(
     prefix="/products",
     tags=["products"],
 )
-
-class ProductCreateRequest(BaseModel):
-    name: str
-    stock: int
-    price: float
-
-class ProductPurchaseRequest(BaseModel):
-    quantity: int
-
-class ProductIncreaseStockRequest(BaseModel):
-    quantity: int
-
 
 def product_service():
     product_respository = ProductRepositoryImpl()
@@ -52,18 +42,18 @@ async def create_product(request: ProductCreateRequest, product_service: Product
 async def delete_product(product_id: int, product_service: ProductService = Depends(product_service)):
     return await product_service.delete_product(product_id=product_id)
 
-# @router.post("/{product_id}/purchase")
-# async def purchase_product(product_id: int, request: ProductPurchaseRequest, product_service: ProductService = Depends(product_service)):
-#     return await product_service.purchase_product(
-#         product_id=product_id,
-#         quantity=request.quantity
-#     )
+@router.post("/{product_id}/purchase")
+async def purchase_product(product_id: int, request: ProductPurchaseRequest, product_service: ProductService = Depends(product_service)):
+    return await product_service.purchase_product(
+        product_id=product_id,
+        quantity=request.quantity
+    )
 
-# @router.post("/{product_id}/increase_stock")
-# async def increase_stock(product_id: int, request: ProductIncreaseStockRequest, product_service: ProductService = Depends(product_service)):
-#     return await product_service.increase_stock(
-#         product_id=product_id,
-#         quantity=request.quantity
-#     )
+@router.post("/{product_id}/increase_stock")
+async def increase_stock(product_id: int, request:ProductIncreaseStockRequest, product_service: ProductService = Depends(product_service)):
+    return await product_service.increase_stock(
+        product_id=product_id,
+        quantity=request.quantity
+    )
 
 

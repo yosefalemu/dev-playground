@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from typing import Annotated
 
 from app.application.services.product_service import ProductService
@@ -22,6 +22,20 @@ ProductServiceType = Annotated[ProductService, Depends(product_service)]
 @router.get("/")
 async def get_products(product_service: ProductServiceType):
     return await product_service.get_products()
+
+@router.get("/search")
+async def search_products(
+    product_service: ProductServiceType,
+    request: Annotated[ProductSearchQuery, Query()]
+    
+):
+    return await product_service.search_products(
+        filters=ProductSearchFilters(
+            name=request.name,
+            min_price=request.min_price,
+            max_price=request.max_price,
+        )
+    )
 
 @router.get("/{product_id}")
 async def get_product(product_id: int, product_service: ProductServiceType):
@@ -59,18 +73,6 @@ async def increase_stock(product_id: int, request:ProductIncreaseStockRequest, p
         quantity=request.quantity
     )
 
-@router.post("/search")
-async def search_products(
-    product_service: ProductServiceType,
-    request: ProductSearchQuery
-    
-):
-    return await product_service.search_products(
-        filters=ProductSearchFilters(
-            name=request.name,
-            min_price=request.min_price,
-            max_price=request.max_price
-        )
-    )
+
 
 

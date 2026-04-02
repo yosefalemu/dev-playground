@@ -9,7 +9,7 @@ from app.core.database import SessionLocal
 
 
 class ProductRepositoryImpl(ProductRepository):
-    async def get_products(self):
+    async def get_products(self) -> tuple[list[Product], int]:
         async with SessionLocal() as session:
             result = await session.execute(select(ProductModel))
             product_models = result.scalars().all()
@@ -47,7 +47,7 @@ class ProductRepositoryImpl(ProductRepository):
             )
         
 
-    async def get_product_by_name(self, name: str):
+    async def get_product_by_name(self, name: str) -> Optional[Product]:
         async with SessionLocal() as session:
             result = await session.execute(
                 select(ProductModel).where(ProductModel.name == name)

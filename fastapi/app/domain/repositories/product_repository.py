@@ -1,32 +1,37 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Protocol
+from typing import Optional
 from app.domain.entities.product import Product
+from app.domain.filters.product_filters import ProductSearchFilters
 
 class ProductRepository(ABC):
     @abstractmethod
-    def get_products(self) -> list[Product]:
+    async def get_products(self) -> tuple[list[Product], int]:
         pass
 
     @abstractmethod
-    def get_product_by_id(self, product_id: int) -> Optional[Product]:
+    async def get_product_by_id(self, product_id: int) -> Optional[Product]:
         pass
 
     @abstractmethod
-    def get_product_by_name(self, name: str) -> Optional[Product]:
+    async def get_product_by_name(self, name: str) -> Optional[Product]:
         pass
 
     @abstractmethod
-    def create_product(self, product: Product) -> Product:
+    async  def create_product(self, product: Product) -> Product:
         pass
 
     @abstractmethod
-    def delete_product(self, product_id: int) -> Optional[Product]:
+    async def delete_product(self, product_id: int) -> Optional[Product]:
         pass
 
     @abstractmethod
-    def purchase_product(self, product_id: int, quantity: int) -> Product:
+    async def purchase_product(self, product_id: int, quantity: int) -> Optional[Product]:
         pass
 
     @abstractmethod
-    def increase_stock(self, product_id: int, quantity: int) -> Product:
+    async def increase_stock(self, product_id: int, quantity: int) -> Optional[Product]:
+        pass
+
+    @abstractmethod
+    async def search_products(self, filters: ProductSearchFilters) -> tuple[list[Product], int]:
         pass

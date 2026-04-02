@@ -10,3 +10,8 @@ class ProductPurchaseRequest(BaseModel):
 
 class ProductIncreaseStockRequest(BaseModel):
     quantity: int
+
+class ProductSearchQuery(BaseModel):
+    name: str | None = None
+    min_price: float | None = None
+    max_price: float | None = None

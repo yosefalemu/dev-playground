@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request,responses
 from app.core.database import engine
-from app.domain.exceptions.product_exc import InsufficientStockException, ProductAlreadyExistsException, ProductNotFoundException, ProductOutofStockException
+from app.domain.exceptions.product_exc import InsufficientStockException, ProductAlreadyExistsException, ProductNotFoundException, ProductOutofStockException,DatabaseURLNotConfigured
 from app.infrastructure.db.models import Base
 from app.presentation.routes import product_routes
 
@@ -17,6 +17,13 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(product_routes.router)
+
+@app.exception_handler(DatabaseURLNotConfigured)
+async def database_url_not_configured(request: Request, exc: DatabaseURLNotConfigured):
+    return responses.JSONResponse(
+        status_code=404,
+        content={"detail": str(exc)}
+    )
 
 @app.exception_handler(ProductNotFoundException)
 async def product_not_found_exception_handler(request: Request, exc: ProductNotFoundException):

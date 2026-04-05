@@ -9,3 +9,6 @@ class ProductOutofStockException(Exception):
 
 class InsufficientStockException(Exception):
     pass
+
+class DatabaseURLNotConfigured(Exception):
+    pass
